@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import './screens/yes_no_screen.dart';
+import './screens/display_connect_code_screen.dart';
 
 void main() async {
   Intl.defaultLocale = 'jp_JP';
@@ -32,16 +34,16 @@ class __LoadPartner extends State<_LoadPartner> {
   void initState() {
     super.initState();
 
-    // TODO リポジトリの作成
+    // TODO リポジトリの作成（コネクト作業が完了しているか取得）
     // Repository().partnerIsConnected().then((isConnected) {
     //   if (isConnected) {
     //     // TODO YesNo画面の作成
     //     Navigator.of(context)
-    //         .pushReplacement(MaterialPageRoute(builder: (_) => A));
+    //         .pushReplacement(MaterialPageRoute(builder: (_) => YesNoScreen()));
     //   } else {
     //     // TODO コネクト画面の作成
     //     Navigator.of(context)
-    //         .pushReplacement(MaterialPageRoute(builder: (_) => B));
+    //         .pushReplacement(MaterialPageRoute(builder: (_) => displayConnectCodeScreen()));
     //   }
     // }).catchError((e) {
     //   setState(() {
