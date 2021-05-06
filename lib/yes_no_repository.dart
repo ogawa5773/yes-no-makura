@@ -1,29 +1,24 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:yesnomakura/models/user.dart';
 
 class YesNoRepository {
-  // GET
-  Future<bool> partnerIsConnected(String deviceID) async {
-    bool value = false;
-    final docRef = FirebaseFirestore.instance.collection('users').doc(deviceID);
-    docRef.get().then((doc) => {value = doc.exists});
-    // TODO パートナーを持っているかの検索
+  Future<bool> partnerIsConnected(User user) async {
+    bool isConnected = false;
+    final docRef = FirebaseFirestore.instance.collection('connects').doc();
+    // TODO: user.idで検索かける
+    docRef.get().then((doc) => {isConnected = doc.exists});
 
-    return value;
+    return isConnected;
   }
 
-  Future<String> getConnetCode(String deviceID) async {
-    // TODO 検索できなかった時から文字返らないようにする
-    String value = '';
-    final docRef = FirebaseFirestore.instance.collection('users').doc(deviceID);
-    docRef.get().then((doc) => {value = doc.id});
+  // TODO リアルタイム
+  Future<bool> getPartnerDesire(User user) async {
+    // TODO: user.idでconnctsを検索かけパートナーを取得
+    final partner = User(id: '2', code: '2', hasDesire: true);
 
-    return value;
+    return partner.hasDesire;
   }
 
-  // パートナーの意思を取得（リアルタイムに）
-
-  // POST
   Future<void> registerDeviceInfo(String deviceID) async {
     final date = DateTime.now().toLocal().toIso8601String();
     FirebaseFirestore.instance
@@ -32,17 +27,19 @@ class YesNoRepository {
         .set({'date': date});
   }
 
-  Future<void> connect(String connectCode, String deviceID) async {
+  Future<void> connect(String connectCode, User user) async {
     final date = DateTime.now().toLocal().toIso8601String();
     // TODO パートナーユーザーを取得する
+    final host = User(id: '2', code: '2', hasDesire: true);
     FirebaseFirestore.instance
         .collection('partners')
         .doc()
-        .set({'date': 'date'});
+        .set({'host_id': host.id, 'guest_id': user.id, 'date': date});
   }
 
-  // YesNoのデフォルト設定
-
-  // DELETE
-  // コネクト解除
+  Future<void> unconnect(User user) async {
+    final docRef = FirebaseFirestore.instance.collection('connects').doc();
+    // TODO: user.idで検索かけた上で削除
+    docRef.delete();
+  }
 }

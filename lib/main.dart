@@ -4,34 +4,20 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:yesnomakura/yes_no_repository.dart';
+import 'package:provider/provider.dart';
+import './yes_no_repository.dart';
+import './models/user.dart';
 import './screens/yes_no_screen.dart';
 import './screens/display_connect_code_screen.dart';
 
 void main() async {
   Intl.defaultLocale = 'jp_JP';
   await initializeDateFormatting('jp_JP');
-  runApp(YesNoApp());
-}
 
-class YesNoApp extends StatefulWidget {
-  @override
-  _YesNoApp createState() => _YesNoApp();
-}
-
-class _YesNoApp extends State<YesNoApp> {
-  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  String _deviceInfo = '';
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
+  // deviceIDの取得
+  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  String deviceData = '';
   Future<void> initPlatformState() async {
-    String deviceData = '';
-
     try {
       if (Platform.isAndroid) {
         var androidDeviceInfo = await deviceInfoPlugin.androidInfo;
@@ -44,14 +30,15 @@ class _YesNoApp extends State<YesNoApp> {
       deviceData = 'Error';
     }
 
-    // if (!mounted) return
-    setState(() {
-      _deviceInfo = deviceData;
-    });
-
-    YesNoRepository().registerDeviceInfo(_deviceInfo);
+    _deviceInfo = deviceData;
   }
 
+  // TODO userの取得ないしは作成を行う
+  final user = User(id: '1', code: '1', hasDesire: false);
+  runApp(Provider<User>.value(value: user, child: YesNoApp()));
+}
+
+class YesNoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -71,11 +58,14 @@ class _LoadPartner extends StatefulWidget {
 class __LoadPartner extends State<_LoadPartner> {
   Error? _error;
 
+  // https://qiita.com/HiromitsuFukuda/items/10a63a7b347db1712a86
+  // providerから値を取得する上でcontextが必要になるため本来ならinitStateで実行するものをここで実行している
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final User user = context.watch<User>();
 
-    YesNoRepository().partnerIsConnected(_deviceInfo).then((isConnected) {
+    YesNoRepository().partnerIsConnected(user).then((isConnected) {
       if (isConnected) {
         Navigator.of(context)
             .pushReplacement(MaterialPageRoute(builder: (_) => YesNoScreen()));
