@@ -4,42 +4,96 @@ import 'package:yesnomakura/models/user.dart';
 class YesNoRepository {
   Future<bool> partnerIsConnected(User user) async {
     bool isConnected = false;
-    final docRef = FirebaseFirestore.instance.collection('connects').doc();
-    // TODO: user.idで検索かける
-    docRef.get().then((doc) => {isConnected = doc.exists});
+    final docRef = FirebaseFirestore.instance.collection('users').doc(user.id);
+
+    await docRef.get().then((doc) => {
+          if (doc.exists) {isConnected = true} else {isConnected = false}
+        });
 
     return isConnected;
   }
 
-  // TODO リアルタイム
   Future<bool> getPartnerDesire(User user) async {
-    // TODO: user.idでconnctsを検索かけパートナーを取得
-    final partner = User(id: '2', code: '2', hasDesire: true);
+    final db = FirebaseFirestore.instance;
+    User? partner;
 
-    return partner.hasDesire;
+    await db
+        .collection('users')
+        .where('partnerRef', isEqualTo: '/users/${user.id}')
+        .snapshots()
+        .listen((snapshot) => {
+              snapshot.docs.forEach((doc) {
+                partner = doc.data() as User;
+              })
+            });
+
+    return partner!.hasDesire;
   }
 
-  Future<void> registerDeviceInfo(String deviceID) async {
-    final date = DateTime.now().toLocal().toIso8601String();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(deviceID)
-        .set({'date': date});
+  Future<User> initializeOrCreateUser(String deviceID) async {
+    final docRef = FirebaseFirestore.instance.collection('users').doc(deviceID);
+    User? user;
+
+    await docRef.get().then((doc) => {
+          if (doc.exists)
+            {user = doc.data() as User}
+          else
+            {
+              // TODO: codeを発行する
+              user = FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(deviceID)
+                  .set({
+                'id': deviceID,
+                'hasDesire': false,
+                'code': 'aiueo',
+                'partnerRef': null
+              }) as User
+            }
+        });
+
+    return user!;
   }
 
   Future<void> connect(String connectCode, User user) async {
-    final date = DateTime.now().toLocal().toIso8601String();
-    // TODO パートナーユーザーを取得する
-    final host = User(id: '2', code: '2', hasDesire: true);
-    FirebaseFirestore.instance
-        .collection('partners')
-        .doc()
-        .set({'host_id': host.id, 'guest_id': user.id, 'date': date});
+    final db = FirebaseFirestore.instance;
+    User? partner;
+
+    await db
+        .collection('users')
+        .where('code', isEqualTo: connectCode)
+        .get()
+        .then((snapshot) => {
+              snapshot.docs.forEach((doc) {
+                partner = doc.data() as User;
+              })
+            });
+
+    db
+        .collection('users')
+        .doc(user.id)
+        .update({'partnerRef': 'users/${partner!.id}'});
+    db
+        .collection('users')
+        .doc(partner!.id)
+        .update({'partnerRef': 'users/${user.id}'});
   }
 
   Future<void> unconnect(User user) async {
-    final docRef = FirebaseFirestore.instance.collection('connects').doc();
-    // TODO: user.idで検索かけた上で削除
-    docRef.delete();
+    final db = FirebaseFirestore.instance;
+    User? partner;
+
+    await db
+        .collection('users')
+        .where('partnerRef', isEqualTo: '/users/${user.id}')
+        .get()
+        .then((snapshot) => {
+              snapshot.docs.forEach((doc) {
+                partner = doc.data() as User;
+              })
+            });
+
+    db.collection('users').doc(user.id).update({'partnerRef': null});
+    db.collection('users').doc(partner!.id).update({'partnerRef': null});
   }
 }

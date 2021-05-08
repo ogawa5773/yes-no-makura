@@ -9,8 +9,7 @@ class InputConnectCodeScreen extends StatelessWidget {
       TextField(),
       TextButton(
           onPressed: () {
-            // TODO Repositoryの作成（コネクト処理）
-            // await
+            // TODO コネクト処理
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => YesNoScreen()));
           },

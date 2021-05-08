@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './input_connect_code_screen.dart';
+import '../models/user.dart';
 
 class DisplayConnectCodeScreen extends StatelessWidget {
   @override
   @override
   Widget build(BuildContext context) {
-    // TODO リポジトリの作成（自分のコネクトコードを取得
-
+    final User user = context.watch<User>();
     return Center(
         child: Column(children: [
-      Text("マイコード"),
+      Text(user.code),
       TextButton(
           onPressed: () {
             Navigator.of(context).pushReplacement(

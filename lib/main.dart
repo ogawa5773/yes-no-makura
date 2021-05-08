@@ -29,8 +29,6 @@ void main() async {
     } on PlatformException {
       deviceData = 'Error';
     }
-
-    _deviceInfo = deviceData;
   }
 
   // TODO userの取得ないしは作成を行う

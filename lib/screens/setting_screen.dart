@@ -15,7 +15,7 @@ class SettingScreen extends StatelessWidget {
         ],
       ),
       // TODO スライダーで実装
-      body: Column(children: [Text("デフォルト設定"), Text("コネクト解除")]),
+      body: Column(children: [Text("コネクト解除")]),
     );
   }
 }
