@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yesnomakura/yes_no_repository.dart';
 import './setting_screen.dart';
 import '../models/user.dart';
 
@@ -17,12 +18,11 @@ class _YesNoScreen extends State<YesNoScreen> {
   void didChangeDependencies() {
     user = context.watch<User>();
 
-    // TODO 相手の意志を取得
-    // Repository.getCondition().then((value) {
-    //   setState(() {
-    //     partnerCondition = value;
-    //   });
-    // });
+    YesNoRepository().getPartnerDesire(user!).then((value) {
+      setState(() {
+        partnerCondition = value;
+      });
+    });
   }
 
   @override
@@ -38,13 +38,11 @@ class _YesNoScreen extends State<YesNoScreen> {
               })
         ],
       ),
-      // TODO partnerConditionに紐づいた画像を表示
-      // またpartnerConditionをリアルタイムに取得できるようにする
-      body: Text("aaaa"),
+      body: partnerCondition ? Image.network("aaa") : Image.network("bbb"),
       floatingActionButton: FloatingActionButton(
         child: Text("user.hasDesire"),
         onPressed: () {
-          // TODO 自分のdesireの切り替え
+          YesNoRepository().switchMyDesire(user!);
         },
       ),
     );

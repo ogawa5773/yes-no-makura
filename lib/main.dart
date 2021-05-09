@@ -31,9 +31,9 @@ void main() async {
     }
   }
 
-  // TODO userの取得ないしは作成を行う
-  final user = User(id: '1', code: '1', hasDesire: false);
-  runApp(Provider<User>.value(value: user, child: YesNoApp()));
+  initPlatformState();
+  YesNoRepository().initializeOrCreateUser(deviceData).then(
+      (user) => {runApp(Provider<User>.value(value: user, child: YesNoApp()))});
 }
 
 class YesNoApp extends StatelessWidget {

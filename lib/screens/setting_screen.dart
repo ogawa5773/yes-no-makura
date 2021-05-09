@@ -14,8 +14,7 @@ class SettingScreen extends StatelessWidget {
               icon: Icon(Icons.arrow_back))
         ],
       ),
-      // TODO スライダーで実装
-      body: Column(children: [Text("コネクト解除")]),
+      body: Center(child: Text("コネクト解除")),
     );
   }
 }
