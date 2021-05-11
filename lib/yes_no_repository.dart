@@ -5,11 +5,17 @@ import 'package:yesnomakura/models/user.dart';
 class YesNoRepository {
   Future<bool> partnerIsConnected(User user) async {
     bool isConnected = false;
-    final docRef = FirebaseFirestore.instance.collection('users').doc(user.id);
 
-    await docRef.get().then((doc) => {
-          if (doc.exists) {isConnected = true} else {isConnected = false}
-        });
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .get()
+        .then((doc) => {
+              if (doc.data()!["partnerRef"] == null)
+                {isConnected = false}
+              else
+                {isConnected = true}
+            });
 
     return isConnected;
   }
@@ -38,13 +44,18 @@ class YesNoRepository {
     return partner!.hasDesire;
   }
 
+  User _toUser(Map<String, dynamic> data) {
+    return User(
+        id: data['id'], code: data['code'], hasDesire: data['hasDesire']);
+  }
+
   Future<User> initializeOrCreateUser(String deviceID) async {
     final docRef = FirebaseFirestore.instance.collection('users').doc(deviceID);
     User? user;
 
     await docRef.get().then((doc) => {
           if (doc.exists)
-            {user = doc.data() as User}
+            {user = _toUser(new Map<String, dynamic>.from(doc.data()!))}
           else
             {
               user = FirebaseFirestore.instance
@@ -72,15 +83,15 @@ class YesNoRepository {
         .get()
         .then((snapshot) => {
               snapshot.docs.forEach((doc) {
-                partner = doc.data() as User;
+                partner = _toUser(new Map<String, dynamic>.from(doc.data()));
               })
             });
 
-    db
+    await db
         .collection('users')
         .doc(user.id)
         .update({'partnerRef': 'users/${partner!.id}'});
-    db
+    await db
         .collection('users')
         .doc(partner!.id)
         .update({'partnerRef': 'users/${user.id}'});
@@ -96,7 +107,7 @@ class YesNoRepository {
         .get()
         .then((snapshot) => {
               snapshot.docs.forEach((doc) {
-                partner = doc.data() as User;
+                partner = _toUser(new Map<String, dynamic>.from(doc.data()));
               })
             });
 

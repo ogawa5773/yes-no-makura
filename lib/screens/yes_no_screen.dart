@@ -16,6 +16,7 @@ class _YesNoScreen extends State<YesNoScreen> {
   // providerから値を取得する上でcontextが必要になるため本来ならinitStateで実行するものをここで実行している
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     user = context.watch<User>();
 
     YesNoRepository().getPartnerDesire(user!).then((value) {
@@ -38,11 +39,13 @@ class _YesNoScreen extends State<YesNoScreen> {
               })
         ],
       ),
-      body: partnerCondition ? Image.network("aaa") : Image.network("bbb"),
+      body: partnerCondition ? Icon(Icons.arrow_back_ios) : Icon(Icons.android),
+      // body: partnerCondition ? Image.network("aaa") : Image.network("bbb"),
       floatingActionButton: FloatingActionButton(
         child: Text("user.hasDesire"),
-        onPressed: () {
-          YesNoRepository().switchMyDesire(user!);
+        onPressed: () async {
+          await YesNoRepository().switchMyDesire(user!);
+          // TODO リビルド
         },
       ),
     );

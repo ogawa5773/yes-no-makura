@@ -9,25 +9,31 @@ class InputConnectCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(children: [
-      TextField(
-        controller: controller,
-        decoration: InputDecoration(
-            hintText: 'コネクトコードを入力', hintStyle: TextStyle(color: Colors.grey)),
+    final User user = context.watch<User>();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("コード入力画面"),
       ),
-      TextButton(
-          onPressed: () {
-            YesNoRepository().connect(controller.text, context.watch<User>());
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => YesNoScreen()));
-          },
-          child: Text("登録する")),
-      TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text("キャンセル"))
-    ]));
+      body: Center(
+          child: Column(children: [
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+              hintText: 'コネクトコードを入力', hintStyle: TextStyle(color: Colors.grey)),
+        ),
+        TextButton(
+            onPressed: () async {
+              await YesNoRepository().connect(controller.text, user);
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => YesNoScreen()));
+            },
+            child: Text("登録する")),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("キャンセル"))
+      ])),
+    );
   }
 }

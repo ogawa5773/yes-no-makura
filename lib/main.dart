@@ -5,12 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import './yes_no_repository.dart';
 import './models/user.dart';
 import './screens/yes_no_screen.dart';
 import './screens/display_connect_code_screen.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   Intl.defaultLocale = 'jp_JP';
   await initializeDateFormatting('jp_JP');
 
@@ -23,8 +26,11 @@ void main() async {
         var androidDeviceInfo = await deviceInfoPlugin.androidInfo;
         deviceData = androidDeviceInfo.androidId;
       } else if (Platform.isIOS) {
-        var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
-        deviceData = iosDeviceInfo.identifierForVendor;
+        // メモ シュミレーターだと値取れないのでコメントアウト
+        // var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
+        // deviceData = iosDeviceInfo.identifierForVendor;
+
+        deviceData = '1';
       }
     } on PlatformException {
       deviceData = 'Error';
