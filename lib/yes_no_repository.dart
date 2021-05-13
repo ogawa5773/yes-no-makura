@@ -53,22 +53,25 @@ class YesNoRepository {
     final docRef = FirebaseFirestore.instance.collection('users').doc(deviceID);
     User? user;
 
+    // 存在していなければcreate
     await docRef.get().then((doc) => {
-          if (doc.exists)
-            {user = _toUser(new Map<String, dynamic>.from(doc.data()!))}
-          else
+          if (!doc.exists)
             {
-              user = FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(deviceID)
-                  .set({
+              FirebaseFirestore.instance.collection('users').doc(deviceID).set({
                 'id': deviceID,
                 'hasDesire': false,
                 'code': randomString(6),
                 'partnerRef': null
-              }) as User
+              }).then((value) => {})
             }
         });
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(deviceID)
+        .get()
+        .then((doc) =>
+            user = _toUser(new Map<String, dynamic>.from(doc.data()!)));
 
     return user!;
   }

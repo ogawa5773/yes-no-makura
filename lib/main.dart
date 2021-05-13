@@ -30,7 +30,7 @@ void main() async {
         // var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
         // deviceData = iosDeviceInfo.identifierForVendor;
 
-        deviceData = '1';
+        deviceData = '8';
       }
     } on PlatformException {
       deviceData = 'Error';

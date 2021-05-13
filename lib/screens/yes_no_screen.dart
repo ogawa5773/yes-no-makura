@@ -42,10 +42,11 @@ class _YesNoScreen extends State<YesNoScreen> {
       body: partnerCondition ? Icon(Icons.arrow_back_ios) : Icon(Icons.android),
       // body: partnerCondition ? Image.network("aaa") : Image.network("bbb"),
       floatingActionButton: FloatingActionButton(
-        child: Text("user.hasDesire"),
+        child: Text("${user?.hasDesire.toString()}"),
         onPressed: () async {
           await YesNoRepository().switchMyDesire(user!);
-          // TODO リビルド
+          // userと画面をupdateする
+          context.read<User>().updateDesire();
         },
       ),
     );
