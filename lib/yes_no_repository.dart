@@ -1,60 +1,15 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yesnomakura/models/user.dart';
+import 'package:yesnomakura/models/partner.dart';
 
 class YesNoRepository {
-  Future<bool> partnerIsConnected(User user) async {
-    bool isConnected = false;
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.id)
-        .get()
-        .then((doc) => {
-              if (doc.data()!["partnerRef"] == null)
-                {isConnected = false}
-              else
-                {isConnected = true}
-            });
-
-    return isConnected;
-  }
-
-  Future<void> switchMyDesire(User user) async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.id)
-        .update({'hasDesire': !user.hasDesire});
-  }
-
-  Future<bool> getPartnerDesire(User user) async {
-    final db = FirebaseFirestore.instance;
-    User? partner;
-
-    db
-        .collection('users')
-        .where('partnerRef', isEqualTo: '/users/${user.id}')
-        .snapshots()
-        .listen((snapshot) => {
-              snapshot.docs.forEach((doc) {
-                partner = doc.data() as User;
-              })
-            });
-
-    return partner!.hasDesire;
-  }
-
-  User _toUser(Map<String, dynamic> data) {
-    return User(
-        id: data['id'], code: data['code'], hasDesire: data['hasDesire']);
-  }
-
-  Future<User> initializeOrCreateUser(String deviceID) async {
-    final docRef = FirebaseFirestore.instance.collection('users').doc(deviceID);
-    User? user;
+  Stream<User> initializeOrFindUser(String deviceID) {
+    final ref = FirebaseFirestore.instance.collection('users');
 
     // 存在していなければcreate
-    await docRef.get().then((doc) => {
+    // TODO awaitする
+    ref.doc(deviceID).get().then((doc) => {
           if (!doc.exists)
             {
               FirebaseFirestore.instance.collection('users').doc(deviceID).set({
@@ -66,14 +21,24 @@ class YesNoRepository {
             }
         });
 
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(deviceID)
-        .get()
-        .then((doc) =>
-            user = _toUser(new Map<String, dynamic>.from(doc.data()!)));
+    return ref.doc(deviceID).snapshots().map((doc) => User.fromFirestore(doc));
+  }
 
-    return user!;
+  Stream<Partner> getPartner(String deviceID) {
+    // TODO 相手がいない場合の返る場合の処理
+    final ref = FirebaseFirestore.instance.collection('users');
+
+    return ref
+        .where('partnerRef', isEqualTo: 'users/$deviceID')
+        .snapshots()
+        .map((doc) => {Partner.fromFirestore(doc.docs[0])}.first);
+  }
+
+  void switchMyDesire(User user) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .update({'hasDesire': !user.hasDesire});
   }
 
   Future<void> connect(String connectCode, User user) async {
@@ -86,7 +51,7 @@ class YesNoRepository {
         .get()
         .then((snapshot) => {
               snapshot.docs.forEach((doc) {
-                partner = _toUser(new Map<String, dynamic>.from(doc.data()));
+                partner = User.fromFirestore(doc);
               })
             });
 
@@ -110,7 +75,7 @@ class YesNoRepository {
         .get()
         .then((snapshot) => {
               snapshot.docs.forEach((doc) {
-                partner = _toUser(new Map<String, dynamic>.from(doc.data()));
+                partner = User.fromFirestore(doc);
               })
             });
 

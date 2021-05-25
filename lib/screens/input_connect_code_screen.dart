@@ -5,11 +5,11 @@ import './yes_no_screen.dart';
 import '../models/user.dart';
 
 class InputConnectCodeScreen extends StatelessWidget {
-  TextEditingController controller = new TextEditingController();
+  final TextEditingController controller = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final User user = context.watch<User>();
+    final User user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("コード入力画面"),

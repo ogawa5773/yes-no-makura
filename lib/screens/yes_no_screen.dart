@@ -1,33 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yesnomakura/models/partner.dart';
 import 'package:yesnomakura/yes_no_repository.dart';
 import './setting_screen.dart';
 import '../models/user.dart';
 
-class YesNoScreen extends StatefulWidget {
-  _YesNoScreen createState() => _YesNoScreen();
-}
-
-class _YesNoScreen extends State<YesNoScreen> {
-  bool partnerCondition = false;
-  User? user;
-
-  // https://qiita.com/HiromitsuFukuda/items/10a63a7b347db1712a86
-  // providerから値を取得する上でcontextが必要になるため本来ならinitStateで実行するものをここで実行している
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    user = context.watch<User>();
-
-    YesNoRepository().getPartnerDesire(user!).then((value) {
-      setState(() {
-        partnerCondition = value;
-      });
-    });
-  }
-
+class YesNoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+    final partner = Provider.of<Partner>(context);
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -39,14 +22,11 @@ class _YesNoScreen extends State<YesNoScreen> {
               })
         ],
       ),
-      body: partnerCondition ? Icon(Icons.arrow_back_ios) : Icon(Icons.android),
-      // body: partnerCondition ? Image.network("aaa") : Image.network("bbb"),
+      body: Text("${partner.hasDesire.toString()}"),
       floatingActionButton: FloatingActionButton(
-        child: Text("${user?.hasDesire.toString()}"),
-        onPressed: () async {
-          await YesNoRepository().switchMyDesire(user!);
-          // userと画面をupdateする
-          context.read<User>().updateDesire();
+        child: Text("${user.hasDesire.toString()}"),
+        onPressed: () {
+          YesNoRepository().switchMyDesire(user);
         },
       ),
     );

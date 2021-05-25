@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './yes_no_repository.dart';
 import './models/user.dart';
+import './models/partner.dart';
 import './screens/yes_no_screen.dart';
 import './screens/display_connect_code_screen.dart';
 
@@ -17,82 +18,63 @@ void main() async {
   Intl.defaultLocale = 'jp_JP';
   await initializeDateFormatting('jp_JP');
 
-  // deviceIDの取得
-  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  String deviceData = '';
-  Future<void> initPlatformState() async {
-    try {
-      if (Platform.isAndroid) {
-        var androidDeviceInfo = await deviceInfoPlugin.androidInfo;
-        deviceData = androidDeviceInfo.androidId;
-      } else if (Platform.isIOS) {
-        // メモ シュミレーターだと値取れないのでコメントアウト
-        // var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
-        // deviceData = iosDeviceInfo.identifierForVendor;
-
-        deviceData = '8';
-      }
-    } on PlatformException {
-      deviceData = 'Error';
-    }
-  }
-
-  initPlatformState();
-  YesNoRepository().initializeOrCreateUser(deviceData).then(
-      (user) => {runApp(Provider<User>.value(value: user, child: YesNoApp()))});
+  runApp(YesNoApp());
 }
 
 class YesNoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'YesNo App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: _LoadPartner());
+    // TODO deviceIDの取得
+    // final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    String deviceData = '';
+    // Future<void> initPlatformState() async {
+    //   try {
+    //     if (Platform.isAndroid) {
+    //       var androidDeviceInfo = await deviceInfoPlugin.androidInfo;
+    //       deviceData = androidDeviceInfo.androidId;
+    //     } else if (Platform.isIOS) {
+    //       // メモ シュミレーターだと値取れないのでコメントアウト
+    //       // var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
+    //       // deviceData = iosDeviceInfo.identifierForVendor;
+
+    //       deviceData = '8';
+    //     }
+    //   } on PlatformException {
+    //     deviceData = 'Error';
+    //   }
+    // }
+
+    // initPlatformState();
+
+    deviceData = '8';
+
+    return MultiProvider(
+        providers: [
+          StreamProvider<User>(
+              create: (_) => YesNoRepository().initializeOrFindUser(deviceData),
+              initialData: User('', '', false, null)),
+          StreamProvider<Partner>(
+              create: (_) => YesNoRepository().getPartner(deviceData),
+              initialData: Partner('', '', false, null)),
+        ],
+        child: MaterialApp(
+            title: 'YesNo App',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: LoadPartner()));
   }
 }
 
-class _LoadPartner extends StatefulWidget {
-  @override
-  __LoadPartner createState() => __LoadPartner();
-}
-
-class __LoadPartner extends State<_LoadPartner> {
-  Error? _error;
-
-  // https://qiita.com/HiromitsuFukuda/items/10a63a7b347db1712a86
-  // providerから値を取得する上でcontextが必要になるため本来ならinitStateで実行するものをここで実行している
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final User user = context.watch<User>();
-
-    YesNoRepository().partnerIsConnected(user).then((isConnected) {
-      if (isConnected) {
-        Navigator.of(context)
-            .pushReplacement(MaterialPageRoute(builder: (_) => YesNoScreen()));
-      } else {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => DisplayConnectCodeScreen()));
-      }
-    }).catchError((e) {
-      setState(() {
-        _error = e;
-      });
-    });
-  }
-
+class LoadPartner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Center(
-        child: (_error == null)
-            ? CircularProgressIndicator()
-            : Text(_error.toString()),
-      ),
+      body:
+          user.partnerRef != null ? YesNoScreen() : DisplayConnectCodeScreen(),
     );
   }
 }

@@ -6,7 +6,7 @@ import '../models/user.dart';
 class DisplayConnectCodeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final User user = context.watch<User>();
+    final User user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("コード入力画面"),
