@@ -17,37 +17,33 @@ void main() async {
   await Firebase.initializeApp();
   Intl.defaultLocale = 'jp_JP';
   await initializeDateFormatting('jp_JP');
+  String deviceData = '';
+  Future<void> initPlatformState() async {
+    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    try {
+      if (Platform.isAndroid) {
+        var androidDeviceInfo = await deviceInfoPlugin.androidInfo;
+        deviceData = androidDeviceInfo.androidId;
+      } else if (Platform.isIOS) {
+        var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
+        deviceData = iosDeviceInfo.identifierForVendor;
+      }
+    } on PlatformException {
+      deviceData = 'Error';
+    }
+  }
 
-  runApp(YesNoApp());
+  await initPlatformState();
+
+  runApp(YesNoApp(deviceData));
 }
 
 class YesNoApp extends StatelessWidget {
+  final String deviceData;
+  YesNoApp(this.deviceData);
+
   @override
   Widget build(BuildContext context) {
-    // TODO deviceIDの取得
-    // final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-    String deviceData = '';
-    // Future<void> initPlatformState() async {
-    //   try {
-    //     if (Platform.isAndroid) {
-    //       var androidDeviceInfo = await deviceInfoPlugin.androidInfo;
-    //       deviceData = androidDeviceInfo.androidId;
-    //     } else if (Platform.isIOS) {
-    //       // メモ シュミレーターだと値取れないのでコメントアウト
-    //       // var iosDeviceInfo = await deviceInfoPlugin.iosInfo;
-    //       // deviceData = iosDeviceInfo.identifierForVendor;
-
-    //       deviceData = '8';
-    //     }
-    //   } on PlatformException {
-    //     deviceData = 'Error';
-    //   }
-    // }
-
-    // initPlatformState();
-
-    deviceData = '8';
-
     return MultiProvider(
         providers: [
           StreamProvider<User>(

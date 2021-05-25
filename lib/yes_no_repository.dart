@@ -17,7 +17,7 @@ class YesNoRepository {
                 'hasDesire': false,
                 'code': randomString(6),
                 'partnerRef': null
-              }).then((value) => {})
+              })
             }
         });
 
@@ -25,13 +25,14 @@ class YesNoRepository {
   }
 
   Stream<Partner> getPartner(String deviceID) {
-    // TODO 相手がいない場合の返る場合の処理
+    // FIXME レコードがない場合handleErrorで揉み消している
     final ref = FirebaseFirestore.instance.collection('users');
 
     return ref
-        .where('partnerRef', isEqualTo: 'users/$deviceID')
+        .where('partnerRef', isEqualTo: '//users/$deviceID')
         .snapshots()
-        .map((doc) => {Partner.fromFirestore(doc.docs[0])}.first);
+        .map((doc) => {Partner.fromFirestore(doc.docs.first)}.first)
+        .handleError((error) => {print("//////////$error////////")});
   }
 
   void switchMyDesire(User user) {
