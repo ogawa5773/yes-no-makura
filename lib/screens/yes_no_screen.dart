@@ -15,11 +15,12 @@ class YesNoScreen extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => SettingScreen()));
-              })
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => SettingScreen()));
+            },
+          ),
         ],
       ),
       body: Text("${partner.hasDesire.toString()}"),

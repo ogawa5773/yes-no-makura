@@ -10,10 +10,9 @@ class User {
 
   User(this.id, this.code, this.hasDesire, this.partnerRef);
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-
   Map<dynamic, dynamic> toJson() => _$UserToJson(this);
 
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   factory User.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
     User user = User.fromJson(documentSnapshot.data()!);

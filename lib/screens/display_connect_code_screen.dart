@@ -8,19 +8,32 @@ class DisplayConnectCodeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final User user = Provider.of<User>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("コード入力画面"),
-      ),
+      appBar: AppBar(),
       body: Center(
-          child: Column(children: [
-        Text(user.code),
-        TextButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => InputConnectCodeScreen()));
-            },
-            child: Text("コードを入力する"))
-      ])),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              color: Colors.pink[50],
+              width: 200,
+              height: 100,
+              child: Text(user.code),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => InputConnectCodeScreen(),
+                  ),
+                );
+              },
+              child: Text("パートナーのコネクトコードを入力する"),
+              style: TextButton.styleFrom(primary: Colors.pink[200]),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

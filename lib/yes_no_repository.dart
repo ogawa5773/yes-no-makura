@@ -7,32 +7,41 @@ class YesNoRepository {
   Stream<User> initializeOrFindUser(String deviceID) {
     final ref = FirebaseFirestore.instance.collection('users');
 
-    // 存在していなければcreate
-    // TODO awaitする
-    ref.doc(deviceID).get().then((doc) => {
-          if (!doc.exists)
-            {
-              FirebaseFirestore.instance.collection('users').doc(deviceID).set({
-                'id': deviceID,
-                'hasDesire': false,
-                'code': randomString(6),
-                'partnerRef': null
-              })
-            }
-        });
+    // FIXME
+    // Streamでお茶を濁しているが本当はここでawaitしたい
+    ref.doc(deviceID).get().then(
+          (doc) => {
+            if (!doc.exists)
+              {
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(deviceID)
+                    .set(
+                  {
+                    'id': deviceID,
+                    'hasDesire': false,
+                    'code': randomString(6),
+                    'partnerRef': null
+                  },
+                )
+              },
+          },
+        );
 
     return ref.doc(deviceID).snapshots().map((doc) => User.fromFirestore(doc));
   }
 
   Stream<Partner> getPartner(String deviceID) {
-    // FIXME レコードがない場合handleErrorで揉み消している
+    // FIXME
+    // レコードがない場合handleErrorで揉み消している
+    // パートナーいない場合はyesno画面表示しないという仕様でお茶を濁している
     final ref = FirebaseFirestore.instance.collection('users');
 
     return ref
         .where('partnerRef', isEqualTo: '//users/$deviceID')
         .snapshots()
         .map((doc) => {Partner.fromFirestore(doc.docs.first)}.first)
-        .handleError((error) => {print("//////////$error////////")});
+        .handleError((error) => {print("$error")});
   }
 
   void switchMyDesire(User user) {
@@ -44,17 +53,21 @@ class YesNoRepository {
 
   Future<void> connect(String connectCode, User user) async {
     final db = FirebaseFirestore.instance;
-    User? partner;
+    Partner? partner;
 
     await db
         .collection('users')
         .where('code', isEqualTo: connectCode)
         .get()
-        .then((snapshot) => {
-              snapshot.docs.forEach((doc) {
-                partner = User.fromFirestore(doc);
-              })
-            });
+        .then(
+          (snapshot) => {
+            snapshot.docs.forEach(
+              (doc) {
+                partner = Partner.fromFirestore(doc);
+              },
+            ),
+          },
+        );
 
     await db
         .collection('users')
@@ -68,20 +81,24 @@ class YesNoRepository {
 
   Future<void> unconnect(User user) async {
     final db = FirebaseFirestore.instance;
-    User? partner;
+    Partner? partner;
 
     await db
         .collection('users')
-        .where('partnerRef', isEqualTo: '/users/${user.id}')
+        .where('partnerRef', isEqualTo: 'users/${user.id}')
         .get()
-        .then((snapshot) => {
-              snapshot.docs.forEach((doc) {
-                partner = User.fromFirestore(doc);
-              })
-            });
+        .then(
+          (snapshot) => {
+            snapshot.docs.forEach(
+              (doc) {
+                partner = Partner.fromFirestore(doc);
+              },
+            ),
+          },
+        );
 
-    db.collection('users').doc(user.id).update({'partnerRef': null});
-    db.collection('users').doc(partner!.id).update({'partnerRef': null});
+    await db.collection('users').doc(user.id).update({'partnerRef': null});
+    await db.collection('users').doc(partner!.id).update({'partnerRef': null});
   }
 }
 

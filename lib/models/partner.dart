@@ -10,11 +10,10 @@ class Partner {
 
   Partner(this.id, this.code, this.hasDesire, this.partnerRef);
 
-  factory Partner.fromJson(Map<String, dynamic> json) =>
-      _$PartnerFromJson(json);
-
   Map<dynamic, dynamic> toJson() => _$PartnerToJson(this);
 
+  factory Partner.fromJson(Map<String, dynamic> json) =>
+      _$PartnerFromJson(json);
   factory Partner.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
     Partner partner = Partner.fromJson(documentSnapshot.data()!);

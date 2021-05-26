@@ -17,6 +17,7 @@ void main() async {
   await Firebase.initializeApp();
   Intl.defaultLocale = 'jp_JP';
   await initializeDateFormatting('jp_JP');
+
   String deviceData = '';
   Future<void> initPlatformState() async {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -45,20 +46,23 @@ class YesNoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          StreamProvider<User>(
-              create: (_) => YesNoRepository().initializeOrFindUser(deviceData),
-              initialData: User('', '', false, null)),
-          StreamProvider<Partner>(
-              create: (_) => YesNoRepository().getPartner(deviceData),
-              initialData: Partner('', '', false, null)),
-        ],
-        child: MaterialApp(
-            title: 'YesNo App',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            home: LoadPartner()));
+      providers: [
+        StreamProvider<User>(
+          create: (_) => YesNoRepository().initializeOrFindUser(deviceData),
+          initialData: User('', '', false, null),
+        ),
+        StreamProvider<Partner>(
+          create: (_) => YesNoRepository().getPartner(deviceData),
+          initialData: Partner('', '', false, null),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'YesNo App',
+        theme: ThemeData(
+            primaryColor: Colors.pink[100], accentColor: Colors.pink[100]),
+        home: LoadPartner(),
+      ),
+    );
   }
 }
 

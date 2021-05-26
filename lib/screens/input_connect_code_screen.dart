@@ -11,29 +11,39 @@ class InputConnectCodeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final User user = Provider.of<User>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("コード入力画面"),
-      ),
+      appBar: AppBar(),
       body: Center(
-          child: Column(children: [
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-              hintText: 'コネクトコードを入力', hintStyle: TextStyle(color: Colors.grey)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              child: TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                    hintText: 'コネクトコードを入力',
+                    hintStyle: TextStyle(color: Colors.grey)),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                await YesNoRepository().connect(controller.text, user);
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (_) => YesNoScreen(),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: Text("コネクトする"),
+              style: TextButton.styleFrom(
+                primary: Colors.pink[200],
+              ),
+            ),
+          ],
         ),
-        TextButton(
-            onPressed: () async {
-              await YesNoRepository().connect(controller.text, user);
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => YesNoScreen()));
-            },
-            child: Text("登録する")),
-        TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text("キャンセル"))
-      ])),
+      ),
     );
   }
 }
