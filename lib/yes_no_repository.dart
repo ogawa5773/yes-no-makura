@@ -38,7 +38,7 @@ class YesNoRepository {
     final ref = FirebaseFirestore.instance.collection('users');
 
     return ref
-        .where('partnerRef', isEqualTo: '//users/$deviceID')
+        .where('partnerRef', isEqualTo: 'users/$deviceID')
         .snapshots()
         .map((doc) => {Partner.fromFirestore(doc.docs.first)}.first)
         .handleError((error) => {print("$error")});

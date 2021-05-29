@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:yesnomakura/models/partner.dart';
 import 'package:yesnomakura/yes_no_repository.dart';
 import './setting_screen.dart';
+import './rain_screen.dart';
 import '../models/user.dart';
 
 class YesNoScreen extends StatelessWidget {
@@ -23,7 +24,8 @@ class YesNoScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Text("${partner.hasDesire.toString()}"),
+      body:
+          partner.hasDesire ? Text("${partner.hasDesire.toString()}") : Rain(),
       floatingActionButton: FloatingActionButton(
         child: Text("${user.hasDesire.toString()}"),
         onPressed: () {
