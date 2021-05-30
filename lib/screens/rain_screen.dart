@@ -6,11 +6,11 @@ class RainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blue[50],
       body: Stack(
         children: [
           ...List.generate(
-            500, // 雨粒の数
+            2000, // 雨粒の数
             (_) => Particle(
               key: UniqueKey(),
               rainArea: 5000,
@@ -34,6 +34,7 @@ class _ParticleState extends State<Particle>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController = AnimationController(
     vsync: this,
+    // 経過時間変えてもアニメーション変化ないぞ？
     duration: const Duration(seconds: 1),
   );
   final random = Random();
@@ -43,7 +44,7 @@ class _ParticleState extends State<Particle>
   late double length;
   late double resetTime;
 
-  var count = 0;
+  int count = 0;
   @override
   void initState() {
     super.initState();
@@ -65,10 +66,13 @@ class _ParticleState extends State<Particle>
 
   void reset() {
     count = 0;
+    // ここでrandom.nextDouble()を用いて位置と粒度がランダムな雨粒を生成している
+    //// -500 <= x <= 1500 ??
     initXPos = (random.nextDouble() * widget.rainArea) - (widget.rainArea / 2);
     initYPos = -random.nextDouble() * 1000;
-    strokeWidth = random.nextDouble() / 4;
-    length = random.nextDouble() * 280;
+    strokeWidth = random.nextDouble();
+    length = random.nextDouble() * 10;
+    //// 10 <= x <= 110 ??
     resetTime = 10 + random.nextDouble() * 100;
   }
 
@@ -78,7 +82,9 @@ class _ParticleState extends State<Particle>
       animation: animationController,
       builder: (context, child) {
         return CustomPaint(
+          // 1秒ごとに位置が変化する（count × velocity分位置が変化する
           painter: ParticlePainter(
+            // x軸でWind.instance.yVelocity + 60.0をかけるのはなぜ？
             xPos: initXPos +
                 (count *
                     (Wind.instance.xVelocity *
@@ -94,6 +100,7 @@ class _ParticleState extends State<Particle>
   }
 }
 
+// 与えられた条件で描画してるだけ
 class ParticlePainter extends CustomPainter {
   ParticlePainter({
     required this.xPos,
@@ -110,17 +117,19 @@ class ParticlePainter extends CustomPainter {
   final double xVelocity;
 
   @override
+  // size=画面サイズ, canvas=それに乗っけるcanvas？
   void paint(Canvas canvas, Size size) {
     final paint = Paint();
     final random = Random();
+    // 0 <= x <= 0.02
     final fluctuation = random.nextDouble() / 50;
     paint.strokeWidth = strokeWidth;
-    paint.color = Colors.black;
+    paint.color = Colors.blueGrey;
     canvas.drawLine(
       Offset(xPos, yPos),
       Offset(
         xPos + (40 + length) * (xVelocity + fluctuation),
-        yPos + (40 + length), // 40 は最小の長さ
+        yPos + (40 + length),
       ),
       paint,
     );
