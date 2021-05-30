@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yesnomakura/models/partner.dart';
 import 'package:yesnomakura/yes_no_repository.dart';
+import '../models/user.dart';
 import './setting_screen.dart';
 import './rain_screen.dart';
-import '../models/user.dart';
+import './love_screen.dart';
 
 class YesNoScreen extends StatelessWidget {
   @override
@@ -24,8 +25,7 @@ class YesNoScreen extends StatelessWidget {
           ),
         ],
       ),
-      body:
-          partner.hasDesire ? Text("${partner.hasDesire.toString()}") : Rain(),
+      body: partner.hasDesire ? LoveScreen() : RainScreen(),
       floatingActionButton: FloatingActionButton(
         child: Text("${user.hasDesire.toString()}"),
         onPressed: () {

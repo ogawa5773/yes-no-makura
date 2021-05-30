@@ -58,8 +58,11 @@ class YesNoApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'YesNo App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-            primaryColor: Colors.pink[100], accentColor: Colors.pink[100]),
+          primaryColor: Colors.pink[50],
+          accentColor: Colors.pink[50],
+        ),
         home: LoadPartner(),
       ),
     );
