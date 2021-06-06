@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "781233686751",
+    "project_id": "yesnomakura-d99b1",
+    "storage_bucket": "yesnomakura-d99b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781233686751:android:905814ca590954eac9c16a",
+        "android_client_info": {
+          "package_name": "com.daichiogawa.yesnomakura"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "781233686751-ga8jndtp8k742bch93k3akmhr0l59oqr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBu-2UausOvd61PjxSyKU90LegpG8Ne48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "781233686751-ga8jndtp8k742bch93k3akmhr0l59oqr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "781233686751-0bn24262tqp06fimnmembrsmdo3mlqrc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.daichiogawa.yesnomakura"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
